@@ -1,11 +1,9 @@
-'use client';
-import { useState } from 'react';
 import type { Metadata } from 'next';
 import { Roboto_Flex } from 'next/font/google';
-import { Moon, Sun, Desktop } from '@phosphor-icons/react';
 
 import './globals.css';
 import { IMenu, Navbar } from '@/shared/components/navbar/index';
+import { AppThemeProvider } from '@/shared/context/themeContext';
 
 const roboto = Roboto_Flex({ subsets: ['latin'] });
 
@@ -29,8 +27,10 @@ export default function RootLayout({
       <body
         className={`${roboto.className} bg-white dark:bg-black bg-no-repeat overflow-x-hidden`}
       >
-        <Navbar menu={navItems} />
-        {children}
+        <AppThemeProvider>
+          <Navbar menu={navItems} />
+          {children}
+        </AppThemeProvider>
       </body>
     </html>
   );

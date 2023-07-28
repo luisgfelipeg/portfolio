@@ -1,10 +1,19 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { X, List, ChatText, Gear } from '@phosphor-icons/react';
+import { useState, useEffect, useContext } from 'react';
+import {
+  X,
+  List,
+  ChatText,
+  Gear,
+  Sun,
+  Moon,
+  Desktop,
+} from '@phosphor-icons/react';
 import Image from 'next/image';
 import Logo from '../../images/logo.png';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { ThemeContext } from '@/shared/context/themeContext';
 
 export interface IMenu {
   menuItem: string;
@@ -22,6 +31,20 @@ export const Navbar = ({ menu }: INavbarProps) => {
   const [openMenu, setOpenMenu] = useState<Boolean>(false);
   const [toggleSettings, setToggleSettings] = useState<Boolean>(false);
 
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
+  const element = document.documentElement;
+
+  const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function themeOnWindowMatch() {
+    if (darkQuery.matches) {
+      element.classList.add('dark');
+    } else {
+      element.classList.remove('dark');
+    }
+  }
+
   useEffect(() => {
     if (pathname.startsWith('/')) {
       setActive(menu[0].menuItem);
@@ -30,7 +53,20 @@ export const Navbar = ({ menu }: INavbarProps) => {
     } else {
       setActive(menu[1].menuItem);
     }
-  }, []);
+    switch (theme) {
+      case 'dark':
+        element.classList.add('dark');
+        break;
+      case 'light':
+        element.classList.remove('dark');
+        break;
+      case 'system':
+        themeOnWindowMatch();
+        break;
+      default:
+        break;
+    }
+  }, [theme]);
 
   return (
     <div className='w-full'>
@@ -129,17 +165,74 @@ export const Navbar = ({ menu }: INavbarProps) => {
         </div>
       </nav>
       <div
-        className={`w-96 h-full z-50 bg-sky-300 outline outline-sky-200 absolute top-0 duration-500 transition-all rounded-l-xl flex flex-col ${
+        className={`w-96 h-full z-50 dark:bg-gray-950 bg-white outline outline-sky-200 absolute top-0 duration-500 transition-all rounded-l-xl flex flex-col ${
           toggleSettings ? 'right-0' : 'right-[-387px] top-[-1000px]'
         }`}
       >
         <div className='flex justify-between mx-1 mr-4 mt-4'>
-          <span className='text-xl font-bold'>Configurações</span>
+          <span className='text-xl font-bold text-black dark:text-white'>
+            Configurações
+          </span>
+
           <button
             className='hover:bg-sky-200 hover:rounded-full duration-500'
             onClick={() => setToggleSettings(false)}
           >
-            <X size={28} weight='regular' color='black' />
+            <X
+              size={28}
+              weight='regular'
+              className='text-black dark:text-white'
+            />
+          </button>
+        </div>
+        <hr className='border border-sky-200 mt-3' />
+        <span className='mt-4 mx-1 text-black dark:text-gray-50 mb-1'>
+          Modo
+        </span>
+        <div className='flex justify-evenly mx-2 rounded-full'>
+          <button
+            className={`border-y-[1px] border-l-[1px] border-black dark:border-gray-50 flex-1 flex justify-center rounded-l-full py-1 ${
+              theme === 'light'
+                ? 'border-r-[1px] bg-sky-200 border-sky-400 hover:bg-sky-300 hover:border-sky-500 duration-300 '
+                : 'border-black dark:border-gray-50 hover:bg-slate-700 duration-300'
+            }`}
+            onClick={() => toggleTheme('light')}
+          >
+            <Sun
+              size={32}
+              weight='thin'
+              className='text-black dark:text-white'
+            />
+          </button>
+          <button
+            className={`border flex-1 flex justify-center py-1 ${
+              theme === 'system'
+                ? 'border bg-sky-200 border-sky-400 hover:bg-sky-300 hover:border-sky-500 duration-300'
+                : `border-black dark:border-gray-50 hover:bg-slate-700 duration-300 ${
+                    theme === 'light' ? 'border-l-0' : 'border-r-0'
+                  }`
+            }`}
+            onClick={() => toggleTheme('system')}
+          >
+            <Desktop
+              size={32}
+              weight='thin'
+              className='text-black dark:text-white'
+            />
+          </button>
+          <button
+            className={`border-y-[1px] border-r-[1px] flex-1 flex justify-center rounded-r-full py-1 border-black ${
+              theme === 'dark'
+                ? 'border-l-[1px] bg-sky-200 border-sky-400 hover:bg-sky-300 hover:border-sky-500 duration-300'
+                : 'border-black dark:border-gray-50 hover:bg-slate-700 duration-300'
+            }`}
+            onClick={() => toggleTheme('dark')}
+          >
+            <Moon
+              size={32}
+              weight='thin'
+              className='text-black dark:text-white'
+            />
           </button>
         </div>
       </div>
